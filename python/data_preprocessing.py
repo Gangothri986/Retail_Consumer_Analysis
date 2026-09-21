@@ -1,4 +1,8 @@
+print("SCRIPT STARTED")
+
 import pandas as pd
+
+print("PANDAS IMPORTED")
 
 
 # ============================================================
@@ -16,13 +20,24 @@ def preprocess_data(file_path):
     # --------------------------------------------------------
 
     df = pd.read_csv(file_path)
+  
 
     print("=" * 60)
     print("DATASET LOADED")
     print("=" * 60)
+    
 
     print(f"Rows: {df.shape[0]}")
     print(f"Columns: {df.shape[1]}")
+    print("=" * 60)
+    print("Head:\n",  df.head())
+    print("=" * 60)
+    print("Info:\n",  df.info())
+    print("=" * 60)
+    print("Describe\n",  df.describe())
+    print("=" * 60)
+    print("Describe all\n", df.describe(include='all'))
+    print("=" * 60)
 
 
     # --------------------------------------------------------
@@ -31,12 +46,15 @@ def preprocess_data(file_path):
 
     # Fill missing review ratings using the median
     # review rating within each category.
+
+    print("Is null:\n ", df.isnull().sum())
+    print("=" * 60)
     df["Review Rating"] = df.groupby("Category")[
         "Review Rating"
     ].transform(
         lambda x: x.fillna(x.median())
     )
-
+    print("Is null:\n ", df.isnull().sum())
 
     # --------------------------------------------------------
     # 3. STANDARDIZE COLUMN NAMES
@@ -47,13 +65,15 @@ def preprocess_data(file_path):
     df.columns = df.columns.str.lower()
     df.columns = df.columns.str.replace(" ", "_")
 
+    print("colums:", df.columns)
+
     # Rename purchase amount column.
     df = df.rename(
         columns={
             "purchase_amount_(usd)": "purchase_amount"
         }
     )
-
+    print("colums:", df.columns)
 
     # --------------------------------------------------------
     # 4. CREATE AGE GROUP
@@ -71,7 +91,7 @@ def preprocess_data(file_path):
         q=4,
         labels=labels
     )
-
+    print(df[['age', 'age_group']].head(10))
 
     # --------------------------------------------------------
     # 5. CONVERT PURCHASE FREQUENCY INTO DAYS
@@ -93,10 +113,10 @@ def preprocess_data(file_path):
         )
     )
 
-
+    print(df[['purchase_frequency_days', 'frequency_of_purchases']].head(10))
     # --------------------------------------------------------
     # 6. DATA CONSISTENCY CHECK
-    # --------------------------------------------------------
+    # -------------------------------------------------------- 
 
     discount_promo_match = (
         df["discount_applied"]
@@ -112,8 +132,11 @@ def preprocess_data(file_path):
         f"{discount_promo_match}"
     )
 
+    df=df.drop('promo_code_used', axis=1)
+    print(df.columns)
 
-    # --------------------------------------------------------
+    # -----------------------------------------
+    # ---------------
     # 7. FINAL DATASET INFORMATION
     # --------------------------------------------------------
 
@@ -138,7 +161,11 @@ def preprocess_data(file_path):
 # RUN DIRECTLY
 # ============================================================
 
+print("NAME IS:", __name__)
+
 if __name__ == "__main__":
+
+    print("MAIN BLOCK STARTED")
 
     file_path = "../data/customer_shopping_behavior.csv"
 

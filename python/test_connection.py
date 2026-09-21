@@ -1,18 +1,18 @@
-
-import pandas as pd
 from sqlalchemy import create_engine
+import pandas as pd
 
-# =========================
 
-# SERVER + DATABASE
-# =========================
+# ============================================================
+# SQL SERVER CONFIGURATION
+# ============================================================
 
-server = r'localhost\SQLEXPRESS'
-database = 'customer_behaviour'
+server = r"localhost\SQLEXPRESS"
+database = "customer_behaviour"
 
-# =========================
-# CONNECTION STRING
-# =========================
+
+# ============================================================
+# DATABASE CONNECTION
+# ============================================================
 
 connection_string = (
     f"mssql+pyodbc://@{server}/{database}"
@@ -20,19 +20,36 @@ connection_string = (
     "&trusted_connection=yes"
 )
 
-# =========================
-# CREATE ENGINE
-# =========================
-
 engine = create_engine(connection_string)
 
-# =========================
-# TEST CONNECTION
-# =========================
 
-query = "SELECT name FROM sys.tables"
+# ============================================================
+# TEST DATABASE CONNECTION
+# ============================================================
 
-df = pd.read_sql(query, engine)
+try:
+    query = "SELECT name FROM sys.tables"
 
-print("CONNECTION SUCCESSFUL!")
-print(df)
+    tables = pd.read_sql(query, engine)
+
+    print("=" * 60)
+    print("DATABASE CONNECTION SUCCESSFUL!")
+    print("=" * 60)
+
+    print("\nTables in the database:")
+
+    if tables.empty:
+        print("No tables found.")
+    else:
+        print(tables.to_string(index=False))
+
+except Exception as e:
+    print("=" * 60)
+    print("DATABASE CONNECTION FAILED")
+    print("=" * 60)
+
+    print("\nError:")
+    print(e)
+
+finally:
+    engine.dispose()
